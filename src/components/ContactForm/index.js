@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 
+import { useState, useRef } from 'react';
 import { Form, ButtonContainer } from './style';
 
 import FormGroup from '../FormGroup';
@@ -8,14 +9,25 @@ import Select from '../Select';
 import Button from '../Button';
 
 export default function ContactForm({ buttonLabel }) {
+  // Controlled components
+  const [name, setName] = useState('');
+
+  // Uncontrolled components
+  //const emailInput = document.getElementById('input-email');
+  const emailInput = useRef(null);
+
   return (
     <Form>
       <FormGroup>
-        <Input placeholder="Nome" />
+        <Input
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          placeholder="Nome"
+        />
       </FormGroup>
 
       <FormGroup>
-        <Input placeholder="E-mail" />
+        <Input placeholder="E-mail" ref={emailInput} />
       </FormGroup>
 
       <FormGroup>
