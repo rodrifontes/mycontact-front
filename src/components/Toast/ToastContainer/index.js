@@ -11,7 +11,7 @@ export default function ToastContainer() {
     function handleAddToast({ type, text }) {
       setMessages((prevState) => [
         ...prevState,
-        { id: Math.random, type, text },
+        { id: Math.random(), type, text },
       ]);
     }
 
@@ -22,13 +22,19 @@ export default function ToastContainer() {
     };
   }, []);
 
+  function handleRemoveMessage(id) {
+    setMessages((prevstate) => prevstate.filter(
+      (message) => message.id !== id,
+    ))
+  }
+
   return (
     <Container>
       {messages.map((message) => (
         <ToastMessage
           key={message.id}
-          type={message.type}
-          text={message.text}
+          message={message}
+          onRemoveMessage={handleRemoveMessage}
         />
       ))}
     </Container>
