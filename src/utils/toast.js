@@ -1,4 +1,4 @@
-import EventManager from '../../lib/EventManager';
+import EventManager from '../lib/EventManager';
 
 export const toastEventManager = new EventManager();
 

@@ -2,7 +2,7 @@ import { Container } from './styles';
 
 import ToastMessage from '../ToastMessage';
 import { useState, useEffect, useCallback } from 'react';
-import { toastEventManager } from '../../../services/utils/toast';
+import { toastEventManager } from '../../../utils/toast';
 
 export default function ToastContainer() {
   const [messages, setMessages] = useState([]);

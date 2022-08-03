@@ -1,7 +1,7 @@
 import ContactForm from '../../components/ContactForm';
 import PageHeader from '../../components/PageHeader';
 import ContactsService from '../../services/ContactsService';
-import toast from '../../services/utils/toast';
+import toast from '../../utils/toast';
 
 export default function NewContact() {
 
@@ -11,7 +11,7 @@ export default function NewContact() {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        category_id: formData.category_id,
+        category_id: formData.categoryId,
       };
 
       await ContactsService.createContact(contact);
