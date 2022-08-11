@@ -21,6 +21,7 @@ import magnifierQuestion from '../../assets/images/magnifier-question.svg';
 
 import Loader from '../../components/Loader';
 import Button from '../../components/Button';
+import Modal from '../../components/Modal';
 
 import ContactsService from '../../services/ContactsService';
 
@@ -30,6 +31,7 @@ export default function Home() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => (
@@ -70,20 +72,41 @@ export default function Home() {
     loadContacts();
   }
 
+  function handleDeleteContact() {
+    setIsDeleteModalVisible(true);
+  }
+
+  function handleCloseDeleteModal() {
+    setIsDeleteModalVisible(false);
+  }
+
   return (
     <Container>
       <Loader isLoading={isLoading} />
 
-      {contacts.length > 0 && (
-        <InputSearchContainer>
-          <input
-            value={searchTerm}
-            type="text"
-            placeholder="Pesquisar contato..."
-            onChange={handleChangeSearchTerm}
-          />
-        </InputSearchContainer>
-      )}
+      <Modal
+        danger
+        visible={isDeleteModalVisible}
+        title="Tem certeza que deseja remover o contato Rodrigo Fontes?"
+        confirmLabel="Deletar"
+        onCancel={handleCloseDeleteModal}
+        onConfirm={() => alert('Confirmar')}
+      >
+        <p>Esta ação não poderá ser desfeita!</p>
+      </Modal>
+
+      {
+        contacts.length > 0 && (
+          <InputSearchContainer>
+            <input
+              value={searchTerm}
+              type="text"
+              placeholder="Pesquisar contato..."
+              onChange={handleChangeSearchTerm}
+            />
+          </InputSearchContainer>
+        )
+      }
 
       <Header
         justifyContent={
@@ -105,79 +128,83 @@ export default function Home() {
         <Link to="/new">Novo Contato</Link>
       </Header>
 
-      {hasError && (
-        <ErrorContainer>
-          <img src={sad} alt="Sad" />
+      {
+        hasError && (
+          <ErrorContainer>
+            <img src={sad} alt="Sad" />
 
-          <div className="details">
-            <strong>Ocorreu um erro ao obter os seus contatos!</strong>
+            <div className="details">
+              <strong>Ocorreu um erro ao obter os seus contatos!</strong>
 
-            <Button type="Button" onClick={handleTryAgain}>
-              Tentar novamente
-            </Button>
-          </div>
-        </ErrorContainer>
-      )}
+              <Button type="Button" onClick={handleTryAgain}>
+                Tentar novamente
+              </Button>
+            </div>
+          </ErrorContainer>
+        )
+      }
 
-      {!hasError && (
-        <>
+      {
+        !hasError && (
+          <>
 
-          {(contacts.length < 1 && !isLoading) && (
-            <EmptyListContainer>
-              <img src={emptyBox} alt="Empty box" />
+            {(contacts.length < 1 && !isLoading) && (
+              <EmptyListContainer>
+                <img src={emptyBox} alt="Empty box" />
 
-              <p>
-                Você ainda não tem nenhum contato cadastrado!
-                Clique no botão <strong>"Novo contato"</strong> à cima
-                para cadastrar o seu primeiro!
-              </p>
-            </EmptyListContainer>
-          )}
+                <p>
+                  Você ainda não tem nenhum contato cadastrado!
+                  Clique no botão <strong>"Novo contato"</strong> à cima
+                  para cadastrar o seu primeiro!
+                </p>
+              </EmptyListContainer>
+            )}
 
-          {(contacts.length > 0 && filteredContacts.length < 1) &&
-            <SearchNotFoundContainer>
-              <img src={magnifierQuestion} alt="Magnifier Question" />
+            {(contacts.length > 0 && filteredContacts.length < 1) &&
+              <SearchNotFoundContainer>
+                <img src={magnifierQuestion} alt="Magnifier Question" />
 
-              <span>
-                Nenhum resultado foi encontrado para <strong>"{searchTerm}"</strong>
-              </span>
-            </SearchNotFoundContainer>
-          }
+                <span>
+                  Nenhum resultado foi encontrado para <strong>"{searchTerm}"</strong>
+                </span>
+              </SearchNotFoundContainer>
+            }
 
-          {filteredContacts.length > 0 && (
-            <ListHeader orderBy={orderBy}>
-              <button type="button" onClick={handleToggleOrderBy}>
-                <span>Nome</span>
-                <img src={arrow} alt="Arrow" />
-              </button>
-            </ListHeader>
-          )}
-
-          {filteredContacts.map((contact) => (
-            <Card key={contact.id}>
-              <div className="info">
-                <div className="contact-name">
-                  <strong>{contact.name}</strong>
-                  {contact.category_name && (
-                    <small>{contact.category_name}</small>
-                  )}
-                </div>
-                <span>{contact.email}</span>
-                <span>{contact.phone}</span>
-              </div>
-
-              <div className="actions">
-                <Link to={`/edit/${contact.id}`}>
-                  <img src={edit} alt="Edit" />
-                </Link>
-                <button type="button">
-                  <img src={trash} alt="Delete" />
+            {filteredContacts.length > 0 && (
+              <ListHeader orderBy={orderBy}>
+                <button type="button" onClick={handleToggleOrderBy}>
+                  <span>Nome</span>
+                  <img src={arrow} alt="Arrow" />
                 </button>
-              </div>
-            </Card>
-          ))}
-        </>
-      )}
+              </ListHeader>
+            )}
+
+            {filteredContacts.map((contact) => (
+              <Card key={contact.id}>
+                <div className="info">
+                  <div className="contact-name">
+                    <strong>{contact.name}</strong>
+                    {contact.category_name && (
+                      <small>{contact.category_name}</small>
+                    )}
+                  </div>
+                  <span>{contact.email}</span>
+                  <span>{contact.phone}</span>
+                </div>
+
+                <div className="actions">
+                  <Link to={`/edit/${contact.id}`}>
+                    <img src={edit} alt="Edit" />
+                  </Link>
+                  <button type="button" onClick={handleDeleteContact}>
+                    <img src={trash} alt="Delete" />
+                  </button>
+                </div>
+              </Card>
+            ))}
+          </>
+        )
+      }
     </Container >
   );
 }
