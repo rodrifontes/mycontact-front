@@ -1,4 +1,4 @@
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 
 import ContactsService from '../../services/ContactsService';
@@ -12,14 +12,17 @@ export default function useEditContact() {
   const contactFormRef = useRef(null);
 
   const { id } = useParams();
-  const history = useHistory();
+  const navigate = useNavigate();
   const safeAsyncAction = useSafeAsyncAction();
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function loadContact() {
       try {
         const contact = await ContactsService.getContactById(
           id,
+          controller.signal,
         );
 
         safeAsyncAction(() => {
@@ -28,9 +31,13 @@ export default function useEditContact() {
           setIsLoading(false);
           setContactName(contact.name);
         });
-      } catch {
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return;
+        }
+
         safeAsyncAction(() => {
-          history.push('/');
+          navigate('/', { replace: true });
           toast({
             type: 'danger',
             text: 'Contato não econtrado!',
@@ -40,7 +47,11 @@ export default function useEditContact() {
     }
 
     loadContact();
-  }, [id, history, safeAsyncAction]);
+
+    return () => {
+      controller.abort();
+    }
+  }, [id, navigate, safeAsyncAction]);
 
   async function handleSubmit(contact) {
     try {
